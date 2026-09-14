@@ -1,0 +1,510 @@
+openapi: 3.0.3
+info:
+  title: Caseloom
+  version: 0.1.0
+  description: >-
+    Applied ML use-case factory that industrializes assets, people, and process
+    into packaged cognitive solutions integrated with client workflows.
+  x-product-slug: ai-enterprise-caseloom
+  x-source: ai-in-enterprise/ML_and_More_V9_isitc_Dec4_2017_final/
+servers:
+  - url: https://api.example.com
+tags:
+  - name: UseCases
+  - name: Readiness
+  - name: ScienceStages
+  - name: Packages
+  - name: Integrations
+  - name: Value
+paths:
+  /v1/use-cases:
+    get:
+      operationId: listUseCases
+      tags: [UseCases]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - name: cognitiveTier
+          in: query
+          schema:
+            type: string
+            enum: [process_automation, cognitive_automation, cognitive_insights, cognitive_engagement]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [intake, blocked, science, packaging, integrating, live, killed]
+      responses:
+        "200":
+          description: Use cases page
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeUseCase" }
+    post:
+      operationId: createUseCase
+      tags: [UseCases]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UseCaseCreate" }
+      responses:
+        "201":
+          description: Use case created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeUseCase" }
+  /v1/use-cases/{useCaseId}:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getUseCase
+      tags: [UseCases]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Use case
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeUseCase" }
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/use-cases/{useCaseId}/readiness:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getReadiness
+      tags: [Readiness]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Three-leg readiness
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeReadinessScore" }
+    put:
+      operationId: updateReadiness
+      tags: [Readiness]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReadinessScore" }
+      responses:
+        "200":
+          description: Readiness updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeReadinessScore" }
+  /v1/use-cases/{useCaseId}/science-stages:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: listScienceStages
+      tags: [ScienceStages]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Science stages
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeScienceStage" }
+    post:
+      operationId: advanceScienceStage
+      tags: [ScienceStages]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ScienceStage" }
+      responses:
+        "201":
+          description: Stage recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeScienceStage" }
+  /v1/use-cases/{useCaseId}/packages:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: wrapPackage
+      tags: [Packages]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PackageCreate" }
+      responses:
+        "201":
+          description: Package wrapped
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopePackage" }
+  /v1/packages:
+    get:
+      operationId: listPackages
+      tags: [Packages]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Packages page
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopePackage" }
+  /v1/integrations:
+    get:
+      operationId: listIntegrations
+      tags: [Integrations]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Integrations page
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeIntegrationEndpoint" }
+    post:
+      operationId: registerIntegration
+      tags: [Integrations]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IntegrationEndpoint" }
+      responses:
+        "201":
+          description: Integration registered
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeIntegrationEndpoint" }
+  /v1/use-cases/{useCaseId}/value:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getValueVerification
+      tags: [Value]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Value baseline vs actual
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeValueVerification" }
+    put:
+      operationId: upsertValueVerification
+      tags: [Value]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ValueVerification" }
+      responses:
+        "200":
+          description: Value updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeValueVerification" }
+components:
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    UnprocessableEntity:
+      description: Validation failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Problem" }
+  schemas:
+    ResponseMeta:
+      type: object
+      required: [requestId, timestamp]
+      properties:
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+
+    UseCase:
+      type: object
+      required: [id, name, businessIssue, cognitiveTier, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        businessIssue:
+          type: string
+          enum: [customer_retention, customer_acquisition, pricing, reliability, risk, fraud, productivity, regulation, complaints]
+        cognitiveTier:
+          type: string
+          enum: [process_automation, cognitive_automation, cognitive_insights, cognitive_engagement]
+        status:
+          type: string
+          enum: [intake, blocked, science, packaging, integrating, live, killed]
+        sponsorId: { type: string }
+    UseCaseCreate:
+      type: object
+      required: [name, businessIssue, cognitiveTier]
+      properties:
+        name: { type: string }
+        businessIssue:
+          type: string
+          enum: [customer_retention, customer_acquisition, pricing, reliability, risk, fraud, productivity, regulation, complaints]
+        cognitiveTier:
+          type: string
+          enum: [process_automation, cognitive_automation, cognitive_insights, cognitive_engagement]
+        sponsorId: { type: string }
+    ReadinessScore:
+      type: object
+      required: [assetsScore, peopleScore, processScore]
+      properties:
+        useCaseId: { type: string }
+        assetsScore: { type: number, format: float }
+        peopleScore: { type: number, format: float }
+        processScore: { type: number, format: float }
+        blockers:
+          type: array
+          items: { type: string }
+        passed: { type: boolean }
+    ScienceStage:
+      type: object
+      required: [stage, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        stage:
+          type: string
+          enum: [data_processing, eda, feature_engineering, feature_selection, predictive_modeling, model_selection, error_analysis, ensembling]
+        status:
+          type: string
+          enum: [active, completed, reentered]
+        metricsNotes: { type: string }
+        reentryFrom: { type: string }
+    Package:
+      type: object
+      required: [id, useCaseId, version, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        version: { type: string }
+        artifactUri: { type: string }
+        modelComponentIds:
+          type: array
+          items: { type: string }
+        status:
+          type: string
+          enum: [wrapped, certified, deployed]
+        accuracyBand: { type: string }
+    PackageCreate:
+      type: object
+      required: [artifactUri, modelComponentIds]
+      properties:
+        artifactUri: { type: string }
+        modelComponentIds:
+          type: array
+          items: { type: string }
+        accuracyBand: { type: string }
+    IntegrationEndpoint:
+      type: object
+      required: [useCaseId, packageId, systemOfRecord, slaMode]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        packageId: { type: string }
+        systemOfRecord: { type: string }
+        slaMode:
+          type: string
+          enum: [batch, realtime]
+        workflowTouchpoint: { type: string }
+        humanReviewRequired: { type: boolean }
+    ValueVerification:
+      type: object
+      required: [useCaseId]
+      properties:
+        useCaseId: { type: string }
+        baselineHumanHours: { type: number }
+        actualHumanHours: { type: number }
+        baselineErrorRate: { type: number, format: float }
+        actualErrorRate: { type: number, format: float }
+        predictionsCompleted: { type: integer }
+        verified: { type: boolean }
+
+    DataEnvelopeUseCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/UseCase" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeUseCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/UseCase" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+
+    DataEnvelopeReadinessScore:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/ReadinessScore" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeReadinessScore:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ReadinessScore" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+
+    DataEnvelopeScienceStage:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/ScienceStage" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeScienceStage:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ScienceStage" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+
+    DataEnvelopePackage:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/Package" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopePackage:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Package" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+
+    DataEnvelopeIntegrationEndpoint:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/IntegrationEndpoint" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeIntegrationEndpoint:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/IntegrationEndpoint" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
+
+    DataEnvelopeValueVerification:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/ValueVerification" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeValueVerification:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/ValueVerification" }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+
